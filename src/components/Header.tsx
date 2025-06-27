@@ -1,16 +1,24 @@
 
 import React from 'react';
-import { ShoppingCart, User, Menu, Wine } from 'lucide-react';
+import { ShoppingCart, User, Menu, Wine, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   cartItemCount: number;
   onMenuClick: () => void;
   onCartClick: () => void;
   onProfileClick: () => void;
+  showAdminAccess?: boolean;
 }
 
-const Header = ({ cartItemCount, onMenuClick, onCartClick, onProfileClick }: HeaderProps) => {
+const Header = ({ cartItemCount, onMenuClick, onCartClick, onProfileClick, showAdminAccess = false }: HeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleAdminAccess = () => {
+    navigate('/admin');
+  };
+
   return (
     <header className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,6 +41,17 @@ const Header = ({ cartItemCount, onMenuClick, onCartClick, onProfileClick }: Hea
           </div>
 
           <div className="flex items-center space-x-4">
+            {showAdminAccess && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAdminAccess}
+                className="hover:bg-orange-50 transition-colors"
+                title="Admin Panel"
+              >
+                <Settings className="h-5 w-5 text-gray-700" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"

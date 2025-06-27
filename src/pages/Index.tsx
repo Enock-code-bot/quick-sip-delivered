@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Wine } from 'lucide-react';
 import Header from '@/components/Header';
@@ -9,6 +8,8 @@ import ProductsGrid from '@/components/ProductsGrid';
 import AgeVerificationModal from '@/components/AgeVerificationModal';
 import AuthModal from '@/components/AuthModal';
 import CartModal from '@/components/CartModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import OrderTracking from '@/components/OrderTracking';
 import Checkout from '@/pages/Checkout';
 import Profile from '@/pages/Profile';
 import { useCart } from '@/hooks/useCart';
@@ -16,7 +17,7 @@ import { products, categories } from '@/data/productsData';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isAgeVerified, setIsAgeVerified] = useState(false);
   const [showAgeModal, setShowAgeModal] = useState(false);
@@ -24,6 +25,8 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCart, setShowCart] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'checkout' | 'profile'>('home');
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeOrder, setActiveOrder] = useState<any>(null);
   const { toast } = useToast();
 
   const {
@@ -36,14 +39,12 @@ const Index = () => {
   } = useCart(products);
 
   React.useEffect(() => {
-    // Show auth modal on app start
     setShowAuthModal(true);
   }, []);
 
   const handleAuthComplete = (userData: any) => {
     setUser(userData);
     setShowAuthModal(false);
-    // Show age verification after successful auth
     setShowAgeModal(true);
   };
 
@@ -56,7 +57,6 @@ const Index = () => {
         description: "You must be 18 or older to access this app.",
         variant: "destructive"
       });
-      // Reset auth state
       setUser(null);
       setShowAuthModal(true);
     } else {
@@ -81,8 +81,34 @@ const Index = () => {
   };
 
   const handleOrderComplete = () => {
+    // Simulate order tracking
+    const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
+    setActiveOrder({
+      id: orderId,
+      status: 'preparing',
+      estimatedTime: '25-30 minutes'
+    });
+    
     clearCart();
     setCurrentView('home');
+    
+    toast({
+      title: "Order Placed Successfully!",
+      description: `Order #${orderId} is being prepared. Track your order below.`,
+    });
+
+    // Simulate order status updates
+    setTimeout(() => {
+      setActiveOrder((prev: any) => prev ? { ...prev, status: 'ready' } : null);
+    }, 5000);
+    
+    setTimeout(() => {
+      setActiveOrder((prev: any) => prev ? { ...prev, status: 'out-for-delivery' } : null);
+    }, 10000);
+    
+    setTimeout(() => {
+      setActiveOrder((prev: any) => prev ? { ...prev, status: 'delivered' } : null);
+    }, 15000);
   };
 
   const filteredProducts = products.filter(product => {
@@ -92,7 +118,13 @@ const Index = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Show auth modal if user is not authenticated
+  // Check if user is admin (simple demo - in real app this would be from backend)
+  const isAdmin = user?.email === 'admin@clicknsip.com';
+
+  if (isLoading) {
+    return <LoadingSpinner message="Loading Click n Sip..." fullScreen />;
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center">
@@ -120,7 +152,6 @@ const Index = () => {
     );
   }
 
-  // Show age verification modal
   if (!isAgeVerified) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center">
@@ -164,6 +195,7 @@ const Index = () => {
         onMenuClick={() => {}}
         onCartClick={() => setShowCart(true)}
         onProfileClick={() => setCurrentView('profile')}
+        showAdminAccess={isAdmin}
       />
 
       <HeroSection
@@ -172,6 +204,17 @@ const Index = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Active Order Tracking */}
+        {activeOrder && (
+          <div className="mb-8">
+            <OrderTracking
+              orderId={activeOrder.id}
+              status={activeOrder.status}
+              estimatedTime={activeOrder.estimatedTime}
+            />
+          </div>
+        )}
+
         <CategoriesSection
           categories={categories}
           onCategorySelect={setSelectedCategory}
