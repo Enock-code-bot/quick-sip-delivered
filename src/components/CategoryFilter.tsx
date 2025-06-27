@@ -18,11 +18,15 @@ interface CategoryFilterProps {
 const CategoryFilter = ({ categories, selectedCategory, onCategorySelect }: CategoryFilterProps) => {
   return (
     <section className="mb-8">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3">
         <Button
           variant={selectedCategory === 'all' ? 'default' : 'outline'}
           onClick={() => onCategorySelect('all')}
-          className={selectedCategory === 'all' ? 'bg-red-600 hover:bg-red-700' : ''}
+          className={`${
+            selectedCategory === 'all' 
+              ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg' 
+              : 'border-2 border-orange-200 hover:bg-orange-50 hover:border-orange-300'
+          } font-medium px-6 py-2 rounded-full transition-all duration-300`}
         >
           All Categories
         </Button>
@@ -31,9 +35,14 @@ const CategoryFilter = ({ categories, selectedCategory, onCategorySelect }: Cate
             key={category.id}
             variant={selectedCategory === category.id ? 'default' : 'outline'}
             onClick={() => onCategorySelect(category.id)}
-            className={selectedCategory === category.id ? 'bg-red-600 hover:bg-red-700' : ''}
+            className={`${
+              selectedCategory === category.id 
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg' 
+                : 'border-2 border-orange-200 hover:bg-orange-50 hover:border-orange-300'
+            } font-medium px-6 py-2 rounded-full transition-all duration-300`}
           >
-            {category.icon} {category.title}
+            <span className="mr-2">{category.icon}</span>
+            {category.title}
           </Button>
         ))}
       </div>
