@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,8 @@ import CategoryCard from '@/components/CategoryCard';
 import ProductCard from '@/components/ProductCard';
 import AgeVerificationModal from '@/components/AgeVerificationModal';
 import CartModal from '@/components/CartModal';
+import Checkout from '@/pages/Checkout';
+import Profile from '@/pages/Profile';
 import { useToast } from '@/hooks/use-toast';
 
 interface CartItem {
@@ -35,6 +36,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [currentView, setCurrentView] = useState<'home' | 'checkout' | 'profile'>('home');
   const { toast } = useToast();
 
   // Sample products data
@@ -168,11 +170,21 @@ const Index = () => {
   };
 
   const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Cart Empty",
+        description: "Add items to your cart before checking out.",
+        variant: "destructive"
+      });
+      return;
+    }
     setShowCart(false);
-    toast({
-      title: "Checkout",
-      description: "Checkout functionality would be implemented here.",
-    });
+    setCurrentView('checkout');
+  };
+
+  const handleOrderComplete = () => {
+    setCartItems([]);
+    setCurrentView('home');
   };
 
   const filteredProducts = products.filter(product => {
@@ -202,13 +214,29 @@ const Index = () => {
     );
   }
 
+  if (currentView === 'checkout') {
+    return (
+      <Checkout
+        items={cartItems}
+        onBack={() => setCurrentView('home')}
+        onOrderComplete={handleOrderComplete}
+      />
+    );
+  }
+
+  if (currentView === 'profile') {
+    return (
+      <Profile onBack={() => setCurrentView('home')} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         onMenuClick={() => {}}
         onCartClick={() => setShowCart(true)}
-        onProfileClick={() => {}}
+        onProfileClick={() => setCurrentView('profile')}
       />
 
       {/* Hero Section */}
