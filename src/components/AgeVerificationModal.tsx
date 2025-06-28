@@ -21,7 +21,7 @@ const AgeVerificationModal = ({ open, onVerificationComplete }: AgeVerificationM
 
     const today = new Date();
     const birth = new Date(birthDate);
-    const age = today.getFullYear() - birth.getFullYear();
+    let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
     
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
@@ -38,7 +38,7 @@ const AgeVerificationModal = ({ open, onVerificationComplete }: AgeVerificationM
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" hideClose>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-center">
             <AlertTriangle className="h-6 w-6 text-orange-500" />
